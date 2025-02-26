@@ -4,6 +4,7 @@
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
+#define BACKGROUND_COLOR 678
 
 int check_sdl_code(int code) {
 	if (code < 0) {
@@ -44,16 +45,21 @@ int main(int argc, char* argv[]) {
 					case (SDLK_9): {
 						quit = 1;
 						exit(0);
-					}
+					} break;
 				}
 			}
 		}
 
-		SDL_Color x = {.r = 0, .g = 0, .b = 0, .a = 255};
+		SDL_Color x = {.r = 18, .g = 0, .b = 0, .a = 255};
 
 		check_sdl_code(SDL_SetRenderDrawColor(renderer, x.r, x.g, x.b, x.a));
+		check_sdl_code(SDL_RenderClear(renderer));
+
+		SDL_RenderPresent(renderer);
+		fprintf(stderr, "Rendered...\n");
 	}
 
+	SDL_DestroyRenderer(renderer);
 	SDL_Quit();
 	return 0;
 }
