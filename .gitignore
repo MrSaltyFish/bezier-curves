@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
 
+# VSCode
+.vscode
+
 # Object files
 *.o
 *.ko
@@ -28,13 +31,13 @@
 *.so.*
 *.dylib
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+# # Executables
+# *.exe
+# *.out
+# *.app
+# *.i*86
+# *.x86_64
+# *.hex
 
 # Debug files
 *.dSYM/

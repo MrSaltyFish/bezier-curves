@@ -40,12 +40,18 @@ int main(int argc, char* argv[]) {
 				case SDL_QUIT:
 					quit = 1;
 					break;
+				case SDL_KEYDOWN: {
+					case (SDLK_9): {
+						quit = 1;
+						exit(0);
+					}
+				}
 			}
 		}
 
 		SDL_Color x = {.r = 0, .g = 0, .b = 0, .a = 255};
 
-		sdl_check_code(SDL_SetRenderDrawColor(renderer, x.r, x.g, x.b, x.a));
+		check_sdl_code(SDL_SetRenderDrawColor(renderer, x.r, x.g, x.b, x.a));
 	}
 
 	SDL_Quit();
