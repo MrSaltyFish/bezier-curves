@@ -4,7 +4,12 @@
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
-#define BACKGROUND_COLOR 678
+#define AMBIENCE_COLOR 0xB9D0E9FF
+#define BACKGROUND_COLOR 0x000000FF
+
+#define HEX_COLOR(hex)                                    \
+	((hex) >> (3 * 8)) & 0xFF, ((hex) >> (2 * 8)) & 0xFF, \
+		((hex) >> (1 * 8)) & 0xFF, ((hex) >> (0 * 8)) & 0xFF
 
 int check_sdl_code(int code) {
 	if (code < 0) {
@@ -20,6 +25,19 @@ void* check_sdl_ptr(void* ptr) {
 		exit(1);
 	}
 	return ptr;
+}
+
+typedef struct {
+	float x;
+	float y;
+} Vec2;
+
+Vec2 vec2(float x, float y) { return (Vec2){x, y}; }
+
+void render_line(SDL_Renderer* renderer, Vec2 begin, Vec2 end, uint32_t color) {
+	check_sdl_code(SDL_SetRenderDrawColor(renderer, HEX_COLOR(color)));
+	check_sdl_code(
+		SDL_RenderDrawLineF(renderer, begin.x, begin.y, end.x, end.y));
 }
 
 int main(int argc, char* argv[]) {
@@ -42,28 +60,28 @@ int main(int argc, char* argv[]) {
 					quit = 1;
 					break;
 				case SDL_KEYDOWN: {
-					case (SDLK_9): {
-						quit = 1;
-						exit(0);
-					} break;
+					switch (event.key.keysym.sym) {
+						case (SDLK_9): {
+							quit = 1;
+							exit(0);
+						} break;
+					}
 				}
 			}
 		}
 
-		SDL_Color x = {.r = 18, .g = 0, .b = 0, .a = 255};
-
-		check_sdl_code(SDL_SetRenderDrawColor(renderer, x.r, x.g, x.b, x.a));
+		check_sdl_code(
+			SDL_SetRenderDrawColor(renderer, HEX_COLOR(BACKGROUND_COLOR)));
 		check_sdl_code(SDL_RenderClear(renderer));
 
+		render_line(renderer, vec2(0.0f, 0.0f),
+					vec2(SCREEN_WIDTH, SCREEN_HEIGHT), 0x00FF00FF);
+
 		SDL_RenderPresent(renderer);
-		fprintf(stderr, "Rendered...\n");
+		SDL_Log("Rendered...\n");
 	}
 
 	SDL_DestroyRenderer(renderer);
 	SDL_Quit();
 	return 0;
 }
-
-// float lerp(float a, float b, float p) { return a * p + b * (1 - p); }
-
-// float midpoint(float a, float b) { return (lerp(a, b, 0.5)); }
