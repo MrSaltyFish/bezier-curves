@@ -8,10 +8,9 @@ This project is an experiment to create and visualize **Bezier Curves** using **
 
 ## Features
 
-- Render **quadratic** and **cubic** Bezier curves.
-- Interactive control points (if implemented).
+- Render Bezier curves with handles, just like in tools like Figma, Inkscape, Adobe Illustrator, Figma etc.
+- Interactive control points.
 - Uses SDL2 for rendering.
-- Optimized curve drawing algorithm.
 
 ## Prerequisites
 
@@ -68,11 +67,9 @@ After compiling, run the executable:
 bezier-curves/
 ├── src/
 │   ├── main.c        # Main file for rendering Bezier curves
-│   ├── bezier.c      # Bezier curve implementation
-│   ├── bezier.h      # Header file for Bezier functions
 │
 ├── build/            # Compiled output directory
-├── Makefile          # Compilation rules
+│   ├── Makefile          # Compilation rules
 ├── README.md         # Documentation
 ```
 
@@ -81,22 +78,17 @@ bezier-curves/
 - **Quadratic Bezier Curve**: Uses 3 points (P0, P1, P2)
 - **Cubic Bezier Curve**: Uses 4 points (P0, P1, P2, P3)
 - Formula:
+
   ```
   B(t) = (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2  (Quadratic)
   B(t) = (1-t)^3 * P0 + 3(1-t)^2t * P1 + 3(1-t)t^2 * P2 + t^3 * P3 (Cubic)
   ```
 
-## Future Enhancements
-
-- Add user interaction to move control points.
-- Implement higher-order Bezier curves.
-- Improve performance with adaptive curve subdivision.
+- Here, I have implemented Cubic Bezier Curves.
 
 ## License
 
-This project is released under the **MIT License**.
-
----
+## This project is released under the **MIT License**.
 
 ### Author
 
