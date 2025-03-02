@@ -12,7 +12,7 @@
 
 #define MARKER_SIZE 10.0f
 
-#define BACKGROUND_COLOR 0x000000FF
+#define BACKGROUND_COLOR 0x121212FF
 #define LINE_COLOR 0xDA2C38FF
 
 #define AMBIENCE_COLOR 0xB9D0E9FF
@@ -20,7 +20,7 @@
 #define WHITE_COLOR 0xFFFFFFFF
 #define RED_COLOR 0xFF0000FF
 #define BLUE_COLOR 0x0000FFFF
-#define GREEN_COLOR 0x00FF00FF
+#define GREEN_COLOR 0x15FE15FF
 
 #define HEX_COLOR(hex)                                    \
 	((hex) >> (3 * 8)) & 0xFF, ((hex) >> (2 * 8)) & 0xFF, \
@@ -208,6 +208,8 @@ int main(int argc, char* argv[]) {
 		}
 
 		if (ps_count >= 4) {
+			render_line(renderer, ps[0], ps[1], RED_COLOR);
+			render_line(renderer, ps[2], ps[3], RED_COLOR);
 			render_bezier_markers(renderer, ps[0], ps[1], ps[2], ps[3], 0.01f,
 								  GREEN_COLOR);
 		}
