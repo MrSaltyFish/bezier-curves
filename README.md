@@ -1,5 +1,7 @@
 # Bezier Curves in C using SDL
 
+![thumbnail](./thumbnail.png)
+
 ## Overview
 
 This project is an experiment to create and visualize **Bezier Curves** using **C** and the **SDL2** library. The implementation allows rendering smooth curves using a set of control points.
