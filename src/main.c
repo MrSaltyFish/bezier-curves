@@ -12,10 +12,15 @@
 
 #define MARKER_SIZE 10.0f
 
-#define MARKER_COLOR 0xB9D0E9FF
 #define BACKGROUND_COLOR 0x000000FF
 #define LINE_COLOR 0xDA2C38FF
-#define INTERPOLATOR_COLOR 0x87C38FFF
+
+#define AMBIENCE_COLOR 0xB9D0E9FF
+
+#define WHITE_COLOR 0xFFFFFFFF
+#define RED_COLOR 0xFF0000FF
+#define BLUE_COLOR 0x0000FFFF
+#define GREEN_COLOR 0x00FF00FF
 
 #define HEX_COLOR(hex)                                    \
 	((hex) >> (3 * 8)) & 0xFF, ((hex) >> (2 * 8)) & 0xFF, \
@@ -81,6 +86,19 @@ void render_marker(SDL_Renderer* renderer, Vec2 pos, uint32_t color) {
 	fill_rect(renderer, vec2_sub(pos, vec2_scale(size, 0.5f)), size, color);
 }
 
+void render_bezier_markers(SDL_Renderer* renderer, Vec2 a, Vec2 b, Vec2 c,
+						   Vec2 d, float s, uint32_t color) {
+	for (float p = 0.0f; p <= 1.0f; p += s) {
+		Vec2 ab = lerp_vec2(a, b, p);
+		Vec2 bc = lerp_vec2(b, c, p);
+		Vec2 cd = lerp_vec2(c, d, p);
+		Vec2 abc = lerp_vec2(ab, bc, p);
+		Vec2 bcd = lerp_vec2(bc, cd, p);
+		Vec2 abcd = lerp_vec2(abc, bcd, p);
+		render_marker(renderer, abcd, color);
+	}
+}
+
 #define PS_CAPACITY 256
 
 Vec2 ps[PS_CAPACITY];
@@ -144,14 +162,15 @@ int main(int argc, char* argv[]) {
 		check_sdl_code(SDL_RenderClear(renderer));
 		// Add what to render
 
-		for (size_t i = 0; ps_count > 0 && i < ps_count; i++) {
-			render_marker(renderer, ps[i], MARKER_COLOR);
+		float p = ((sin(t) + 1.0f) * 0.5f);
+
+		for (size_t i = 0; i < ps_count; i++) {
+			render_marker(renderer, ps[i], RED_COLOR);
 		}
 
-		for (size_t i = 0; ps_count > 0 && i < ps_count - 1; i++) {
-			render_marker(renderer,
-						  lerp_vec2(ps[i], ps[i + 1], ((sin(t) + 1.0f) * 0.5f)),
-						  INTERPOLATOR_COLOR);
+		if (ps_count >= 4) {
+			render_bezier_markers(renderer, ps[0], ps[1], ps[2], ps[3], 0.001f,
+								  GREEN_COLOR);
 		}
 
 		// Present the screen, add to time
