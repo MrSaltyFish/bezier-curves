@@ -89,20 +89,35 @@ void render_marker(SDL_Renderer* renderer, Vec2 pos, uint32_t color) {
 void render_bezier_markers(SDL_Renderer* renderer, Vec2 a, Vec2 b, Vec2 c,
 						   Vec2 d, float s, uint32_t color) {
 	for (float p = 0.0f; p <= 1.0f; p += s) {
-		Vec2 ab = lerp_vec2(a, b, p);
-		Vec2 bc = lerp_vec2(b, c, p);
-		Vec2 cd = lerp_vec2(c, d, p);
-		Vec2 abc = lerp_vec2(ab, bc, p);
-		Vec2 bcd = lerp_vec2(bc, cd, p);
-		Vec2 abcd = lerp_vec2(abc, bcd, p);
+		const Vec2 ab = lerp_vec2(a, b, p);
+		const Vec2 bc = lerp_vec2(b, c, p);
+		const Vec2 cd = lerp_vec2(c, d, p);
+		const Vec2 abc = lerp_vec2(ab, bc, p);
+		const Vec2 bcd = lerp_vec2(bc, cd, p);
+		const Vec2 abcd = lerp_vec2(abc, bcd, p);
 		render_marker(renderer, abcd, color);
 	}
 }
 
-#define PS_CAPACITY 256
+#define PS_CAPACITY 4
 
 Vec2 ps[PS_CAPACITY];
 size_t ps_count = 0;
+int ps_selected = -1;
+
+int ps_at(Vec2 pos) {
+	const Vec2 ps_size = vec2(MARKER_SIZE, MARKER_SIZE);
+	for (size_t i = 0; i < ps_count; i++) {
+		const Vec2 ps_begin = vec2_sub(ps[i], vec2_scale(ps_size, 0.5f));
+		const Vec2 ps_end = vec2_add(ps_begin, ps_size);
+
+		if (ps_begin.x <= pos.x && pos.x <= ps_end.x && ps_begin.y <= pos.y &&
+			pos.y <= ps_end.y) {
+			return (int)i;
+		}
+	}
+	return -1;
+}
 
 int main(int argc, char* argv[]) {
 	check_sdl_code(SDL_Init(SDL_INIT_VIDEO));
@@ -148,11 +163,35 @@ int main(int argc, char* argv[]) {
 				case SDL_MOUSEBUTTONDOWN: {
 					switch (event.button.button) {
 						case (SDL_BUTTON_LEFT): {
-							ps[((ps_count++) % PS_CAPACITY)] =
-								// ps[ps_count++] =
+							fprintf(stdout, "Left click!\n");
+							const Vec2 mouse_pos =
 								vec2(event.button.x, event.button.y);
+							if (ps_count < 4) {
+								ps[((ps_count++) % PS_CAPACITY)] =
+									// ps[ps_count++] =
+									mouse_pos;
+							} else {
+								ps_selected = ps_at(mouse_pos);
+							}
 						} break;
 					}
+				} break;
+
+				case SDL_MOUSEBUTTONUP: {
+					switch (event.button.button) {
+						case (SDL_BUTTON_LEFT): {
+							ps_selected = -1;
+						} break;
+					}
+				} break;
+
+				case SDL_MOUSEMOTION: {
+					const Vec2 mouse_pos = vec2(event.motion.x, event.motion.y);
+
+					if (ps_selected > -1) {
+						ps[ps_selected] = mouse_pos;
+					}
+
 				} break;
 			}
 		}
@@ -169,7 +208,7 @@ int main(int argc, char* argv[]) {
 		}
 
 		if (ps_count >= 4) {
-			render_bezier_markers(renderer, ps[0], ps[1], ps[2], ps[3], 0.001f,
+			render_bezier_markers(renderer, ps[0], ps[1], ps[2], ps[3], 0.01f,
 								  GREEN_COLOR);
 		}
 
