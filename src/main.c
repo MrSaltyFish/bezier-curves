@@ -10,12 +10,12 @@
 #define DELTA_TIME_SEC (1.0f / SCREEN_FPS)
 #define DELTA_TIME_MSEC ((Uint32)floorf(DELTA_TIME_SEC * 1000))
 
-#define MARKER_SIZE 20.0f
+#define MARKER_SIZE 10.0f
 
-#define AMBIENCE_COLOR 0xB9D0E9FF
+#define MARKER_COLOR 0xB9D0E9FF
 #define BACKGROUND_COLOR 0x000000FF
 #define LINE_COLOR 0xDA2C38FF
-#define RECT_COLOR 0x87C38FFF
+#define INTERPOLATOR_COLOR 0x87C38FFF
 
 #define HEX_COLOR(hex)                                    \
 	((hex) >> (3 * 8)) & 0xFF, ((hex) >> (2 * 8)) & 0xFF, \
@@ -81,6 +81,11 @@ void render_marker(SDL_Renderer* renderer, Vec2 pos, uint32_t color) {
 	fill_rect(renderer, vec2_sub(pos, vec2_scale(size, 0.5f)), size, color);
 }
 
+#define PS_CAPACITY 256
+
+Vec2 ps[PS_CAPACITY];
+size_t ps_count = 0;
+
 int main(int argc, char* argv[]) {
 	check_sdl_code(SDL_Init(SDL_INIT_VIDEO));
 
@@ -89,14 +94,11 @@ int main(int argc, char* argv[]) {
 									   SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE));
 
 	SDL_Renderer* const renderer =
-		check_sdl_ptr(SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED));
+		check_sdl_ptr(SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE));
 	check_sdl_code(
 		SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT));
 
-	const Vec2 begin = vec2(0.0f, 0.0f);
-	const Vec2 end = vec2(SCREEN_WIDTH, SCREEN_HEIGHT);
-	float p = 0.0f;
-
+	int a = 5;
 	int quit = 0;
 	float t = 0.0f;
 	while (!quit) {
@@ -107,6 +109,8 @@ int main(int argc, char* argv[]) {
 				case SDL_QUIT:
 					quit = 1;
 					break;
+
+				// Handle the keyboard inputs
 				case SDL_KEYDOWN: {
 					switch (event.key.keysym.sym) {
 						case (SDLK_9): {
@@ -114,25 +118,43 @@ int main(int argc, char* argv[]) {
 							exit(0);
 						} break;
 						case (SDLK_UP): {
-							p += 0.1f;
+							a++;
 						} break;
 						case (SDLK_DOWN): {
-							p -= 0.1f;
+							a--;
 						} break;
 					}
-				}
+				} break;
+
+				// Handle the keyboard inputs
+				case SDL_MOUSEBUTTONDOWN: {
+					switch (event.button.button) {
+						case (SDL_BUTTON_LEFT): {
+							ps[((ps_count++) % PS_CAPACITY)] =
+								// ps[ps_count++] =
+								vec2(event.button.x, event.button.y);
+						} break;
+					}
+				} break;
 			}
 		}
-
+		// Clear the rendering screen
 		check_sdl_code(
 			SDL_SetRenderDrawColor(renderer, HEX_COLOR(BACKGROUND_COLOR)));
 		check_sdl_code(SDL_RenderClear(renderer));
+		// Add what to render
 
-		render_marker(renderer, begin, LINE_COLOR);
-		render_marker(renderer, end, LINE_COLOR);
-		render_marker(renderer, lerp_vec2(begin, end, (sin(t) + 1.0f) / 2),
-					  RECT_COLOR);
+		for (size_t i = 0; ps_count > 0 && i < ps_count; i++) {
+			render_marker(renderer, ps[i], MARKER_COLOR);
+		}
 
+		for (size_t i = 0; ps_count > 0 && i < ps_count - 1; i++) {
+			render_marker(renderer,
+						  lerp_vec2(ps[i], ps[i + 1], ((sin(t) + 1.0f) * 0.5f)),
+						  INTERPOLATOR_COLOR);
+		}
+
+		// Present the screen, add to time
 		SDL_RenderPresent(renderer);
 		SDL_Delay(DELTA_TIME_MSEC);
 		t += DELTA_TIME_SEC;
