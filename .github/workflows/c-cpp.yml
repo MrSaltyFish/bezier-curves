@@ -18,5 +18,3 @@ jobs:
 
     - name: Compiling the program
       run: make all
-    - name: Running the program
-      run: make run
