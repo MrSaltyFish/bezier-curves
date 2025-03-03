@@ -1,4 +1,3 @@
-
 # Bezier Curves in C using SDL
 
 ![thumbnail](docs/thumbnail.png)
@@ -80,30 +79,31 @@ make clean
 
 ```
 bezier-curves/
+├── build/                # Compiled output directory
+│   ├── bezier            # Linux executable
+│   ├── bezier.exe        # Windows executable (if cross-compiled)
+│
+├── docs/                 # Compiled output directory
+│   ├── thumbnail.png     # Project image
+│
 ├── src/
-│   ├── main.c        # Main file for rendering Bezier curves
+│   ├── main.c            # Main file for rendering Bezier curves
 │
-├── build/            # Compiled output directory
-│   ├── bezier        # Linux executable
-│   ├── bezier.exe    # Windows executable (if cross-compiled)
-│
-├── Makefile          # Compilation rules
-├── README.md         # Documentation
-├── LICENSE           # License file
-├── thumbnail.png     # Project image
+├── LICENSE               # License file
+├── Makefile              # Compilation rules
+├── README.md             # Documentation
 ```
 
 ## Bezier Curve Basics
 
 - **Quadratic Bezier Curve**: Uses 3 points (P0, P1, P2)
-
 - **Cubic Bezier Curve**: Uses 4 points (P0, P1, P2, P3)
 
 - Formula:
 
   ```
-  B(t) = (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2  (Quadratic)
-  B(t) = (1-t)^3 * P0 + 3(1-t)^2t * P1 + 3(1-t)t^2 * P2 + t^3 * P3 (Cubic)
+  Quadratic - B(t) = (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2
+  Cubic - B(t) = (1-t)^3 * P0 + 3(1-t)^2t * P1 + 3(1-t)t^2 * P2 + t^3 * P3
   ```
 
 - This implementation supports **Cubic Bezier Curves**.
@@ -115,4 +115,3 @@ This project is released under the **MIT License**.
 ### Author
 
 Anvesh Khode
-

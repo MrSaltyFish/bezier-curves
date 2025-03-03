@@ -61,9 +61,10 @@ Vec2 lerp_vec2(Vec2 a, Vec2 b, float p) {
 }
 
 // ======== Points ========
-#define PS_CAPACITY 4
+#define PS_CAPACITY 256
 
 Vec2 ps[PS_CAPACITY];
+Vec2 xs[PS_CAPACITY];
 size_t ps_count = 0;
 int ps_selected = -1;
 
@@ -107,28 +108,34 @@ void render_marker(SDL_Renderer* renderer, Vec2 pos, uint32_t color) {
 	fill_rect(renderer, vec2_sub(pos, vec2_scale(size, 0.5f)), size, color);
 }
 
-Vec2 bezier_sample(Vec2 a, Vec2 b, Vec2 c, Vec2 d, float p) {
-	const Vec2 ab = lerp_vec2(a, b, p);
-	const Vec2 bc = lerp_vec2(b, c, p);
-	const Vec2 cd = lerp_vec2(c, d, p);
-	const Vec2 abc = lerp_vec2(ab, bc, p);
-	const Vec2 bcd = lerp_vec2(bc, cd, p);
-	const Vec2 abcd = lerp_vec2(abc, bcd, p);
-	return abcd;
+Vec2 beziern_sample(Vec2* ps, Vec2* xs, size_t n, float p) {
+	memcpy(xs, ps, sizeof(Vec2) * n);
+	while (n > 1) {
+		for (size_t i = 0; i < n - 1; i++) {
+			xs[i] = lerp_vec2(xs[i], xs[i + 1], p);
+		}
+		n -= 1;
+	}
+	return xs[0];
 }
 
-void render_bezier_markers(SDL_Renderer* renderer, Vec2 a, Vec2 b, Vec2 c,
-						   Vec2 d, float s, uint32_t color) {
+// Vec2 bezier4_sample(Vec2 a, Vec2 b, Vec2 c, Vec2 d, float p) {
+// 	Vec2 xs[] = {a, b, c, d};
+// 	return beziern_sample(ps, xs, 4, p);
+// }
+
+void render_bezier_markers(SDL_Renderer* renderer, Vec2* ps, Vec2* xs, size_t n,
+						   float s, uint32_t color) {
 	for (float p = 0.0f; p <= 1.0f; p += s) {
-		render_marker(renderer, bezier_sample(a, b, c, d, p), color);
+		render_marker(renderer, beziern_sample(ps, xs, n, p), color);
 	}
 }
 
-void render_bezier_curve(SDL_Renderer* renderer, Vec2 a, Vec2 b, Vec2 c, Vec2 d,
+void render_bezier_curve(SDL_Renderer* renderer, Vec2* ps, Vec2* xs, size_t n,
 						 float s, uint32_t color) {
 	for (float p = 0.0f; p + s <= 1.0f; p += s) {
-		const Vec2 line_begin = bezier_sample(a, b, c, d, p);
-		const Vec2 line_end = bezier_sample(a, b, c, d, p + s);
+		const Vec2 line_begin = beziern_sample(ps, xs, n, p);
+		const Vec2 line_end = beziern_sample(ps, xs, n, p + s);
 		render_line(renderer, line_begin, line_end, color);
 	}
 }
@@ -165,6 +172,9 @@ void render_bezier_curve_scalable(SDL_Renderer* renderer, Vec2* points,
 
 // ======== MAIN ========
 int main(int argc, char* argv[]) {
+	printf("argc: %d\n", argc);
+	printf("argv: %s\n", *argv);
+
 	check_sdl_code(SDL_Init(SDL_INIT_VIDEO));
 
 	SDL_Window* const window =
@@ -222,12 +232,12 @@ int main(int argc, char* argv[]) {
 						case (SDL_BUTTON_LEFT): {
 							const Vec2 mouse_pos =
 								vec2(event.button.x, event.button.y);
-							if (ps_count < 4) {
+							ps_selected = ps_at(mouse_pos);
+
+							if (ps_selected < 0) {
 								ps[((ps_count++) % PS_CAPACITY)] =
 									// ps[ps_count++] =
 									mouse_pos;
-							} else {
-								ps_selected = ps_at(mouse_pos);
 							}
 						} break;
 					}
@@ -244,7 +254,7 @@ int main(int argc, char* argv[]) {
 				case SDL_MOUSEWHEEL: {
 					if (event.wheel.y > 0) {
 						bezier_sample_step =
-							fminf(bezier_sample_step + 0.001f, 0.999f);
+							fminf(bezier_sample_step + 0.001f, 1.0f);
 					} else if (event.wheel.y < 0) {
 						bezier_sample_step =
 							fmaxf(bezier_sample_step - 0.001f, 0.001f);
@@ -267,41 +277,21 @@ int main(int argc, char* argv[]) {
 		check_sdl_code(SDL_RenderClear(renderer));
 		// Add what to render
 
-		float p = ((sin(t) + 1.0f) * 0.5f);
-
-		if (ps_count == 3) {
-			render_line(renderer, ps[0], ps[1], RED_COLOR);
-			render_line(renderer, ps[1], ps[2], RED_COLOR);
-			// render_bezier_markers(renderer, ps[0], ps[1], ps[2], ps[3],
-			// 0.01f, 					  GREEN_COLOR);
-			// render_bezier_curve(renderer, ps[0], ps[1], ps[2], ps[3], 0.01f,
-			// GREEN_COLOR);
-			render_bezier_curve_scalable(renderer, ps, 3, 0.01f, GREEN_COLOR);
-		}
-
-		if (ps_count >= 4) {
+		if (ps_count > 1) {
 			if (markers) {
-				render_bezier_markers(renderer, ps[0], ps[1], ps[2], ps[3],
+				render_bezier_markers(renderer, ps, xs, ps_count,
 									  bezier_sample_step, GREEN_COLOR);
 			} else {
-				render_bezier_curve(renderer, ps[0], ps[1], ps[2], ps[3],
+				render_bezier_curve(renderer, ps, xs, ps_count,
 									bezier_sample_step, GREEN_COLOR);
-				// render_bezier_curve_scalable(renderer, ps, 4, step_size,
-				// 							 GREEN_COLOR);
 			}
-
-			// render_bezier_markers(renderer, ps[0], ps[1], ps[2], ps[3],
-			// 0.01f, 					  GREEN_COLOR);
-			// render_bezier_curve(renderer, ps[0], ps[1], ps[2], ps[3], 0.01f,
-			// GREEN_COLOR);
-			// render_bezier_curve_scalable(renderer, ps, 4, BEZIER_SAMPLE_STEP,
-			// 							 GREEN_COLOR);
-			render_line(renderer, ps[0], ps[1], RED_COLOR);
-			render_line(renderer, ps[2], ps[3], RED_COLOR);
 		}
 
 		for (size_t i = 0; i < ps_count; i++) {
 			render_marker(renderer, ps[i], RED_COLOR);
+			if (i < ps_count - 1) {
+				render_line(renderer, ps[i], ps[i + 1], RED_COLOR);
+			}
 		}
 
 		// Present the screen, add to time
