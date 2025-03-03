@@ -179,7 +179,7 @@ int main(int argc, char* argv[]) {
 	int quit = 0;
 	int markers = 1;
 	float t = 0.0f;
-	float step_size = 0.01f;
+	float bezier_sample_step = 0.01f;
 	while (!quit) {
 		SDL_Event event = {0};
 
@@ -204,13 +204,13 @@ int main(int argc, char* argv[]) {
 							};
 						} break;
 						case (SDLK_F2): {
-							if (step_size > 0.1f) {
-								step_size -= 0.1f;
+							if (bezier_sample_step > 0.1f) {
+								bezier_sample_step -= 0.1f;
 							};
 						} break;
 						case (SDLK_F3): {
-							if (step_size < 0.999f) {
-								step_size += 0.1f;
+							if (bezier_sample_step < 0.999f) {
+								bezier_sample_step += 0.1f;
 							};
 						} break;
 					}
@@ -243,9 +243,11 @@ int main(int argc, char* argv[]) {
 
 				case SDL_MOUSEWHEEL: {
 					if (event.wheel.y > 0) {
-						step_size = fminf(step_size - 0.001f, 0.999f);
+						bezier_sample_step =
+							fminf(bezier_sample_step + 0.001f, 0.999f);
 					} else if (event.wheel.y < 0) {
-						step_size = fminf(step_size + 0.001f, 0.001f);
+						bezier_sample_step =
+							fmaxf(bezier_sample_step - 0.001f, 0.001f);
 					}
 				} break;
 
@@ -267,29 +269,25 @@ int main(int argc, char* argv[]) {
 
 		float p = ((sin(t) + 1.0f) * 0.5f);
 
-		for (size_t i = 0; i < ps_count; i++) {
-			render_marker(renderer, ps[i], RED_COLOR);
+		if (ps_count == 3) {
+			render_line(renderer, ps[0], ps[1], RED_COLOR);
+			render_line(renderer, ps[1], ps[2], RED_COLOR);
+			// render_bezier_markers(renderer, ps[0], ps[1], ps[2], ps[3],
+			// 0.01f, 					  GREEN_COLOR);
+			// render_bezier_curve(renderer, ps[0], ps[1], ps[2], ps[3], 0.01f,
+			// GREEN_COLOR);
+			render_bezier_curve_scalable(renderer, ps, 3, 0.01f, GREEN_COLOR);
 		}
 
-		// if (ps_count == 3) {
-		// 	render_line(renderer, ps[0], ps[1], RED_COLOR);
-		// 	render_line(renderer, ps[1], ps[2], RED_COLOR);
-		// 	// render_bezier_markers(renderer, ps[0], ps[1], ps[2], ps[3],
-		// 	// 0.01f, 					  GREEN_COLOR);
-		// 	// render_bezier_curve(renderer, ps[0], ps[1], ps[2], ps[3], 0.01f,
-		// 	// GREEN_COLOR);
-		// 	render_bezier_curve_scalable(renderer, ps, 3, 0.01f, GREEN_COLOR);
-		// }
-
 		if (ps_count >= 4) {
-						if (markers) {
+			if (markers) {
 				render_bezier_markers(renderer, ps[0], ps[1], ps[2], ps[3],
-									  step_size, GREEN_COLOR);
+									  bezier_sample_step, GREEN_COLOR);
 			} else {
-				// render_bezier_curve(renderer, ps[0], ps[1], ps[2], ps[3],
-				// 0.01f, 					GREEN_COLOR);
-				render_bezier_curve_scalable(renderer, ps, 4, step_size,
-											 GREEN_COLOR);
+				render_bezier_curve(renderer, ps[0], ps[1], ps[2], ps[3],
+									bezier_sample_step, GREEN_COLOR);
+				// render_bezier_curve_scalable(renderer, ps, 4, step_size,
+				// 							 GREEN_COLOR);
 			}
 
 			// render_bezier_markers(renderer, ps[0], ps[1], ps[2], ps[3],
@@ -300,6 +298,10 @@ int main(int argc, char* argv[]) {
 			// 							 GREEN_COLOR);
 			render_line(renderer, ps[0], ps[1], RED_COLOR);
 			render_line(renderer, ps[2], ps[3], RED_COLOR);
+		}
+
+		for (size_t i = 0; i < ps_count; i++) {
+			render_marker(renderer, ps[i], RED_COLOR);
 		}
 
 		// Present the screen, add to time
