@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+ compile_ubuntu-latest:
 
     runs-on: ubuntu-latest
 
@@ -15,6 +15,23 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install dependencies
       run: sudo apt update && sudo apt install -y build-essential libsdl2-dev
-
     - name: Compiling the program
       run: make all
+      
+ compile_windows-latest:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-SDL2
+      - name: Add MSYS2 to PATH
+        run: echo "C:\msys64\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
+        shell: powershell
+      - name: Compiling the program
+        run: mingw32-make all
