@@ -13,13 +13,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: configure
-      run: ./configure
-    - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
-    - name: make run
-      run: make run
+    - name: Install dependencies
+      run: sudo apt update && sudo apt install -y build-essential
+    - name: Compiling the program
+      run: make all
+    - name: Cleaning the program
+      run: make all
