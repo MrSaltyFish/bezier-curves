@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -ggdb -std=c11 -pedantic `pkg-config --cflags sdl2` -lm
-LIBS = `pkg-config --libs sdl2`
+CFLAGS = -Wall -Wextra -ggdb -std=c11 -pedantic `pkg-config --cflags sdl2`
+LIBS = `pkg-config --libs sdl2` -lm
 BUILD_DIR = build
 SRC_DIR = src
 TARGET = $(BUILD_DIR)/bezier
