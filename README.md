@@ -10,6 +10,7 @@ This project is an experiment to create and visualize **Bezier Curves** using **
 
 - Render Bezier curves with handles, just like in tools like Figma, Inkscape, Adobe Illustrator, etc.
 - Interactive control points.
+- Control points are interconnected to display initial path in conjunction with final result.
 - Uses SDL2 for rendering.
 
 ## Prerequisites
@@ -97,7 +98,7 @@ bezier-curves/
 ## Bezier Curve Basics
 
 - **Quadratic Bezier Curve**: Uses 3 points (P0, P1, P2)
-- **Cubic Bezier Curve**: Uses 4 points (P0, P1, P2, P3)
+- **Cubic Bezier Curve**: Uses 4 points (P0, P1, P2, P3) and so on
 
 - Formula:
 
@@ -106,7 +107,7 @@ bezier-curves/
   Cubic - B(t) = (1-t)^3 * P0 + 3(1-t)^2t * P1 + 3(1-t)t^2 * P2 + t^3 * P3
   ```
 
-- This implementation supports **Cubic Bezier Curves**.
+- This implementation supports **Arbitrary Degree Bezier Curves**.
 
 ## License
 
