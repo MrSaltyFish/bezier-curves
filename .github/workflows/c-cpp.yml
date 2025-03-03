@@ -1,0 +1,24 @@
+name: C/C++ CI - Bezier Curves
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install dependencies
+      run: sudo apt update && sudo apt install -y build-essential libsdl2-dev
+
+    - name: Compiling the program
+      run: make all
+    - name: Running the program
+      run: make run
+    - name: Cleaning the program
+      run: make all
