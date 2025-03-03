@@ -20,5 +20,3 @@ jobs:
       run: make all
     - name: Running the program
       run: make run
-    - name: Cleaning the program
-      run: make all
