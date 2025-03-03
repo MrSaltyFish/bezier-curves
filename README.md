@@ -1,6 +1,7 @@
+
 # Bezier Curves in C using SDL
 
-![thumbnail](./thumbnail.png)
+![thumbnail](docs/thumbnail.png)
 
 ## Overview
 
@@ -8,7 +9,7 @@ This project is an experiment to create and visualize **Bezier Curves** using **
 
 ## Features
 
-- Render Bezier curves with handles, just like in tools like Figma, Inkscape, Adobe Illustrator, Figma etc.
+- Render Bezier curves with handles, just like in tools like Figma, Inkscape, Adobe Illustrator, etc.
 - Interactive control points.
 - Uses SDL2 for rendering.
 
@@ -22,7 +23,13 @@ Ensure you have the following installed before compiling the project:
 
 ### Installing SDL2
 
-On Linux (Debian/Ubuntu-based):
+On Fedora:
+
+```sh
+sudo dnf install SDL2 SDL2-devel
+```
+
+On Debian/Ubuntu:
 
 ```sh
 sudo apt update
@@ -39,7 +46,7 @@ pacman -S mingw-w64-ucrt-x86_64-SDL2
 
 ### Using Makefile
 
-To compile the project and output to the `build/` directory, run:
+To compile the project and output the executable to the `build/` directory, run:
 
 ```sh
 make
@@ -50,7 +57,7 @@ make
 If not using Makefile, compile with:
 
 ```sh
-gcc -Wall -Wextra -std=c11 -pedantic `pkg-config --cflags --libs sdl2` -o build/bezier main.c
+gcc -Wall -Wextra -std=c11 -pedantic `pkg-config --cflags --libs sdl2` -o build/bezier src/main.c -lm
 ```
 
 ## Running the Program
@@ -61,6 +68,14 @@ After compiling, run the executable:
 ./build/bezier
 ```
 
+## Cleaning the Build
+
+To remove the compiled files and clean the project:
+
+```sh
+make clean
+```
+
 ## File Structure
 
 ```
@@ -69,14 +84,21 @@ bezier-curves/
 │   ├── main.c        # Main file for rendering Bezier curves
 │
 ├── build/            # Compiled output directory
-│   ├── Makefile          # Compilation rules
+│   ├── bezier        # Linux executable
+│   ├── bezier.exe    # Windows executable (if cross-compiled)
+│
+├── Makefile          # Compilation rules
 ├── README.md         # Documentation
+├── LICENSE           # License file
+├── thumbnail.png     # Project image
 ```
 
 ## Bezier Curve Basics
 
 - **Quadratic Bezier Curve**: Uses 3 points (P0, P1, P2)
+
 - **Cubic Bezier Curve**: Uses 4 points (P0, P1, P2, P3)
+
 - Formula:
 
   ```
@@ -84,12 +106,13 @@ bezier-curves/
   B(t) = (1-t)^3 * P0 + 3(1-t)^2t * P1 + 3(1-t)t^2 * P2 + t^3 * P3 (Cubic)
   ```
 
-- Here, I have implemented Cubic Bezier Curves.
+- This implementation supports **Cubic Bezier Curves**.
 
 ## License
 
-## This project is released under the **MIT License**.
+This project is released under the **MIT License**.
 
 ### Author
 
 Anvesh Khode
+
