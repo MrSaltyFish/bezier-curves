@@ -14,7 +14,6 @@ $(TARGET): $(SRC_DIR)/main.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -o $(TARGET) $(SRC_DIR)/main.c $(LIBS)
 
 run: $(TARGET)
-	clear
 	./$(TARGET)
 
 clean:
